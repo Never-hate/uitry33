@@ -28,7 +28,7 @@ jobs:
           sudo apt-get install -y google-chrome-stable
 
       - name: Run Toffee Scraper
-        run: python toffee_auto.py
+        run: update_playlist.py
 
       - name: Commit and Push Changes
         run: |
