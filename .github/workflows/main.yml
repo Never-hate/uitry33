@@ -1,0 +1,40 @@
+name: Toffee Auto Update
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # প্রতি ৬ ঘণ্টা পর পর রান হবে
+  workflow_dispatch:      # ম্যানুয়ালি রান করার অপশন
+
+permissions:
+  contents: write         # রিপোজিটরিতে ফাইল লেখার পারমিশন
+
+jobs:
+  update-playlist:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          pip install selenium undetected-chromedriver webdriver-manager
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Run Toffee Scraper
+        run: python toffee_auto.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git add playlist.m3u
+          # যদি ফাইলে কোনো পরিবর্তন না থাকে তবে এরর এড়াতে 'exit 0' ব্যবহার করা হয়েছে
+          git commit -m "Toffee Playlist Auto Updated [$(date)]" || exit 0
+          git push
